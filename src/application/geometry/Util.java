@@ -10,6 +10,18 @@ public class Util {
 		}
 		return a.add((b.getX()-a.getX())*delta, (b.getY()-a.getY())*delta);
 	}
-	
+
+    public static double bernstein(double t, int n, int k) {
+        return binomial(n, k) * Math.pow(1 - t, n - k) * Math.pow(t, k);
+    }
+
+    public static int binomial(int n, int k) {
+        if (k > n || k < 0)
+            return 0;
+        if ((n == k) || (k == 0)) {
+            return 1;
+        }
+        return binomial(n - 1, k) + binomial(n - 1, k - 1);
+    }
 	
 }

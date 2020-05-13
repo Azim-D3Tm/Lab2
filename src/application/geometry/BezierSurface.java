@@ -14,8 +14,44 @@ public class BezierSurface {
 	public BezierSurface(List<List<Point3D>> ctrlPoints) {
 		criticalPoints = new ArrayList<>(ctrlPoints);
 		points = new Point3D[(int) (1.0 / precision)][(int) (1.0 / precision)];
-		
-		
-		
+		calculatePoints();
 	}
+	
+	public void calculatePoints() {
+		for(double u = 0; u < 1; u+=precision) {
+			for(double v = 0; v < 1; v+=precision) {
+				calculatePoint(u,v);
+			}
+		}
+	}
+	
+	private void calculatePoint(double u, double v) {
+		int uindex = (int) (u/precision);
+		int vindex = (int) (v/precision);
+		
+		double bPoly, sumX = 0, sumY = 0, sumZ = 0;
+
+        for (int i = 0; i < criticalPoints.size(); i++) {
+            for (int j = 0; j < criticalPoints.get(0).size(); j++) {
+                bPoly = Util.bernstein(u, criticalPoints.size() - 1, i) * Util.bernstein(v, criticalPoints.get(0).size() - 1, j);
+
+                sumX += bPoly * criticalPoints.get(i).get(j).getX();
+                sumY += bPoly * criticalPoints.get(i).get(j).getY();
+                sumZ += bPoly * criticalPoints.get(i).get(j).getZ();
+            }
+        }
+		points[uindex][vindex] = new Point3D(sumX, sumY, sumZ);
+	}
+	
+	public List<Triangle> translatePointsToTriangles() {
+        List<Triangle> tris = new ArrayList<>();
+        for (int i = 1; i < points.length; i++) {
+            for (int j = 1; j < points[0].length; j++) {
+                tris.add(new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1]));
+                tris.add(new Triangle(points[i][j - 1], points[i - 1][j], points[i][j]));
+            }
+        }
+        return tris;
+    }
+	
 }
