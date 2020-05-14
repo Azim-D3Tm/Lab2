@@ -10,14 +10,15 @@
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.text.Font?>
 
-<BorderPane maxHeight="600.0" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" maxWidth="1200.0" prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
+<BorderPane maxHeight="600.0" maxWidth="1200.0" onKeyPressed="#onKeyPressed" onKeyReleased="#onKeyReleased" prefHeight="600.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.SampleController">
    <center>
       <TabPane fx:id="tabPane" prefHeight="430.0" prefWidth="891.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
           <Tab fx:id="curveTab" text="Bezier curve">
                <content>
-                  <SplitPane dividerPositions="0.21099887766554434" prefHeight="160.0" prefWidth="200.0">
+                  <SplitPane dividerPositions="0.211" prefHeight="160.0" prefWidth="200.0">
                     <items>
                       <AnchorPane>
                            <children>
@@ -38,24 +39,48 @@
             </Tab>
           <Tab fx:id="surfaceTab" text="Beizer surface">
                <content>
-                  <SplitPane dividerPositions="0.21099887766554434" prefHeight="160.0" prefWidth="200.0">
+                  <SplitPane dividerPositions="0.211" prefHeight="160.0" prefWidth="200.0">
                      <items>
                         <AnchorPane>
                            <children>
-                              <ComboBox fx:id="modeBoxSurface" layoutX="14.0" layoutY="14.0" prefWidth="150.0" />
-                              <TextField fx:id="deltaTextSurface" layoutX="15.0" layoutY="50.0" text="0.05" />
-                              <Label layoutX="173.0" layoutY="54.0" text="Step" />
-                              <Button layoutX="175.0" layoutY="14.0" mnemonicParsing="false" onAction="#resetBtnPressed" text="Reset" />
+                              <TextField fx:id="rotX" layoutX="72.0" layoutY="14.0" prefHeight="25.0" prefWidth="166.0" text="0" />
+                              <TextField fx:id="rotY" layoutX="72.0" layoutY="39.0" prefHeight="25.0" prefWidth="166.0" text="0" />
+                              <Label layoutX="14.0" layoutY="18.0" text="Rotate X" />
+                              <Label layoutX="14.0" layoutY="43.0" text="Rotate Y" />
+                              <Label fx:id="camLocation" layoutX="14.0" layoutY="73.0" text="Camera location">
+                                 <font>
+                                    <Font name="Consolas" size="12.0" />
+                                 </font>
+                              </Label>
+                              <Label fx:id="camDirection" layoutX="14.0" layoutY="90.0" text="Camera direction">
+                                 <font>
+                                    <Font name="Consolas" size="12.0" />
+                                 </font>
+                              </Label>
                            </children>
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" SplitPane.resizableWithParent="false">
                            <children>
-                              <Canvas fx:id="canvasSurface" height="571.0" nodeOrientation="INHERIT" width="944.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Canvas fx:id="canvasSurface" height="571.0" nodeOrientation="INHERIT" onMouseDragged="#onMouseDragged" width="944.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                            </children>
                         </AnchorPane>
                      </items>
                   </SplitPane>
-               </content></Tab>
+               </content>
+           </Tab>
+           <Tab fx:id="lab3Tab" text="CutOut segment">
+           <content>
+           
+           </content>
+               <content>
+                  <SplitPane dividerPositions="0.211" prefHeight="160.0" prefWidth="200.0">
+                    <items>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                    </items>
+                  </SplitPane>
+               </content>
+           </Tab>
         </tabs>
       </TabPane>
    </center>

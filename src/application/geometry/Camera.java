@@ -25,7 +25,7 @@ public class Camera {
         projectionMatrix.values[2][2] = far / (far - near);
         projectionMatrix.values[3][2] = (-far * near) / (far - near);
         projectionMatrix.values[2][3] = 1.0;
-        location = new Point3D(10,10, 10);
+        location = new Point3D(20,20, -20);
         direction = new Point3D(0, 0, 1);
 	}
 	

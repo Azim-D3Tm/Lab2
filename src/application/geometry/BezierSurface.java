@@ -8,7 +8,7 @@ import javafx.geometry.Point3D;
 public class BezierSurface {
 	
 	private List<List<Point3D>> criticalPoints;
-	private static double precision = 0.05;
+	private static double precision = 0.02;
 	private Point3D[][]points;
 	
 	public BezierSurface(List<List<Point3D>> ctrlPoints) {
@@ -27,8 +27,8 @@ public class BezierSurface {
 	
 	private void calculatePoint(double u, double v) {
 		
-		int uindex = (int) Math.round(u * points.length);//(int) (u/precision);
-		int vindex = (int) Math.round(v * points[0].length);//(int) (v/precision);
+		int uindex = (int) Math.round(u * points.length);
+		int vindex = (int) Math.round(v * points[0].length);
 		
 		double bPoly, sumX = 0, sumY = 0, sumZ = 0;
 
