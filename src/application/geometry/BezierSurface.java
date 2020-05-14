@@ -16,7 +16,6 @@ public class BezierSurface {
 		points = new Point3D[(int) (1.0 / precision)][(int) (1.0 / precision)];
 		calculatePoints();
 	}
-	
 	public void calculatePoints() {
 		for(double u = 0; u < 1; u+=precision) {
 			for(double v = 0; v < 1; v+=precision) {

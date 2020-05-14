@@ -18,9 +18,9 @@
         <tabs>
           <Tab fx:id="curveTab" text="Bezier curve">
                <content>
-                  <SplitPane dividerPositions="0.211" prefHeight="160.0" prefWidth="200.0">
+                  <SplitPane dividerPositions="0.211" prefHeight="160.0" prefWidth="200.0" SplitPane.resizableWithParent="false">
                     <items>
-                      <AnchorPane>
+                      <AnchorPane SplitPane.resizableWithParent="false">
                            <children>
                               <ComboBox fx:id="modeBox" layoutX="14.0" layoutY="14.0" prefWidth="150.0">
                               </ComboBox>
@@ -68,15 +68,26 @@
                   </SplitPane>
                </content>
            </Tab>
-           <Tab fx:id="lab3Tab" text="CutOut segment">
+           <Tab fx:id="lab4Tab" text="CutOut segment">
            <content>
            
            </content>
                <content>
                   <SplitPane dividerPositions="0.211" prefHeight="160.0" prefWidth="200.0">
                     <items>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" />
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <ComboBox fx:id="segmentsBox" layoutX="14.0" layoutY="14.0" prefWidth="150.0" />
+                              <TextField fx:id="segmentsAmount" layoutX="15.0" layoutY="49.0" text="30" />
+                              <Label layoutX="178.0" layoutY="53.0" text="Amount" />
+                              <Button onAction="#generateSegments" layoutX="15.0" layoutY="74.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="149.0" text="Generate segments" />
+                              <Button onAction="#resetShape" layoutX="177.0" layoutY="14.0" mnemonicParsing="false" text="Reset" />
+                           </children></AnchorPane>
+                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                           <children>
+                              <Canvas onMousePressed="#onFMousePressed" onMouseClicked="#onMouseClicked" onMouseDragged="#onMouseDragged" fx:id="canvaslab4" height="571.0" nodeOrientation="INHERIT" width="944.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                      </AnchorPane>
                     </items>
                   </SplitPane>
                </content>

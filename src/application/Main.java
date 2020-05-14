@@ -33,7 +33,9 @@ public class Main extends Application {
 			box.getItems().addAll("Add", "Move", "Remove");
 			box.setValue("Add");
 			
-
+			box = (ComboBox<String>) scene.lookup("#segmentsBox");
+			box.getItems().addAll("Add", "Move", "Remove");
+			box.setValue("Add");
 			
 		} catch(Exception e) {
 			e.printStackTrace();

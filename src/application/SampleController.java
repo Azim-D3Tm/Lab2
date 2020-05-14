@@ -10,6 +10,7 @@ import java.util.ResourceBundle;
 
 import application.geometry.BezierSurface;
 import application.geometry.Camera;
+import application.geometry.Line2D;
 import application.geometry.Matrix;
 import application.geometry.Triangle;
 import application.geometry.Util;
@@ -47,9 +48,10 @@ public class SampleController implements Initializable, Runnable{
 
 	private GraphicsContext cg;
 
-	private ArrayList<Point2D> dots = new ArrayList<>();
+	private List<Point2D> dots = new ArrayList<>();
 	private int dragged = -1;
 	private double deltaCurve = 0.05;
+	
 
 
 	//surface
@@ -72,10 +74,21 @@ public class SampleController implements Initializable, Runnable{
 	private BezierSurface surface;
 	private Camera camera;
 
+	
+	//lab 4, segments
 	@FXML
-	private Tab lab3Tab;
+	private Tab lab4Tab;
+	@FXML
+	private Canvas canvaslab4;
+	@FXML
+	private ComboBox<String> segmentsBox;
+	@FXML
+	private TextField segmentsAmount;
+	private GraphicsContext l4g;
 	
-	
+	private List<Line2D> segments;
+	private List<Point2D> figure;
+	private int fdragged = -1;
 
 	public boolean running = true;
 
@@ -83,18 +96,34 @@ public class SampleController implements Initializable, Runnable{
 	}
 
 	public void onMouseClicked(MouseEvent event) {
-		switch(modeBox.getValue()) {
-		case "Add":
-			dots.add(new Point2D(event.getX(), event.getY()));
-			break;
-		case "Move":
-			dragged = -1;
-			break;
-		case "Remove":
-			removeDot(event.getX(), event.getY());
-			break;
-		default:
-			break;
+		if(tabPane.getSelectionModel().getSelectedItem()==curveTab) {
+			switch(modeBox.getValue()) {
+			case "Add":
+				dots.add(new Point2D(event.getX(), event.getY()));
+				break;
+			case "Move":
+				dragged = -1;
+				break;
+			case "Remove":
+				dots = removeDot(dots,event.getX(), event.getY());
+				break;
+			default:
+				break;
+			}
+		}else {
+			switch(segmentsBox.getValue()) {
+			case "Add":
+				figure.add(new Point2D(event.getX(), event.getY()));
+				break;
+			case "Move":
+				fdragged = -1;
+				break;
+			case "Remove":
+				figure = removeDot(figure, event.getX(), event.getY());
+				break;
+			default:
+				break;
+			}
 		}
 	}
 
@@ -154,12 +183,75 @@ public class SampleController implements Initializable, Runnable{
 	public void render() {
 		if(tabPane.getSelectionModel().getSelectedItem()==curveTab) {
 			renderCurve();
-		}else {
+		}else if(tabPane.getSelectionModel().getSelectedItem()==surfaceTab){
 			renderSurface();
+		}else {
+			renderLab4();
 		}
-
 	}
 
+	private void renderLab4() {
+		l4g.clearRect(0, 0, canvaslab4.getWidth(), canvaslab4.getHeight());
+		for(Line2D segment:segments) {
+			if(Util.intersects(figure, segment)) {
+				l4g.setStroke(Color.RED);
+			}else {
+				l4g.setStroke(Color.GREEN);
+			}
+			l4g.strokeLine(segment.a.getX(), segment.a.getY(), segment.b.getX(), segment.b.getY());
+		}
+		l4g.setStroke(Color.BLACK);
+		for(int i = 0; i < figure.size()-1; i++) {
+			l4g.strokeLine(figure.get(i).getX(), figure.get(i).getY(), figure.get(i+1).getX(), figure.get(i+1).getY());
+		}
+		l4g.strokeLine(figure.get(figure.size()-1).getX(), figure.get(figure.size()-1).getY(), figure.get(0).getX(), figure.get(0).getY());
+		
+		for(int i = 0; i < figure.size(); i++) {
+			if(i==fdragged)l4g.setFill(Color.GREEN);
+			l4g.fillOval(figure.get(i).getX()-5, figure.get(i).getY()-5, 10, 10);
+			l4g.setFill(Color.BLACK);
+		}
+	}
+	public void generateSegments(ActionEvent event) {
+		int amount = segments.size();
+		try {
+			amount = Integer.valueOf(segmentsAmount.getText());
+		}catch(Exception e){
+			e.printStackTrace();
+			segmentsAmount.setText(amount+"");
+		}
+		Random r = new Random(System.currentTimeMillis());
+		double width = canvaslab4.getWidth(), height = canvaslab4.getHeight();
+		segments.clear();
+		for(int i = 0; i < amount; i++) {
+			segments.add(new Line2D(
+					new Point2D(r.nextDouble()*width, r.nextDouble()*height),
+					new Point2D(r.nextDouble()*width, r.nextDouble()*height)
+					));
+		}
+	}
+	public void resetShape(ActionEvent event) {
+		figure.clear();
+		figure.add(new Point2D(500,500));
+		figure.add(new Point2D(700,300));
+		figure.add(new Point2D(600,200));
+		figure.add(new Point2D(400,200));
+		figure.add(new Point2D(300,300));
+	}
+	public void onFMousePressed(MouseEvent event) {
+		if(!segmentsBox.getValue().equalsIgnoreCase("Move")) {
+			return;
+		}
+		if(fdragged<0) {
+			int dot = findDot(figure, event.getX(), event.getY());
+			if(dot<0) {
+				return;
+			}
+			fdragged = dot;
+		}
+	}
+	
+	
 	private void renderSurface() {
 		sg.clearRect(0, 0, canvasSurface.getWidth(), canvasSurface.getHeight());
 
@@ -194,11 +286,9 @@ public class SampleController implements Initializable, Runnable{
 					Util.multiplyByMatrix(t.p2, cameraMatrix),
 					Util.multiplyByMatrix(t.p3, cameraMatrix));
 
-
-			/*
 			if(translated.p1.getZ()<0||translated.p2.getZ()<0||translated.p3.getZ()<0) {
 				continue;
-			}*/
+			}
 
 			Triangle projected = new Triangle(
 					Util.multiplyByMatrix(translated.p1, camera.projectionMatrix),
@@ -223,7 +313,6 @@ public class SampleController implements Initializable, Runnable{
 		}
 		return 0;
 	}
-
 	private double getRotationAngleX() {
 		String text = rotX.getText();
 		try {
@@ -234,7 +323,6 @@ public class SampleController implements Initializable, Runnable{
 		}
 		return 0;
 	}
-
 	private void drawCamInfo() {
 		Point3D l = camera.location;
 		camLocation.setText(String.format("Camera location:  %.2f:%.2f:%.2f",+l.getX(),l.getY(),l.getZ()));
@@ -242,7 +330,6 @@ public class SampleController implements Initializable, Runnable{
 		Point3D d = camera.direction;
 		camDirection.setText(String.format("Camera direction: %.2f:%.2f:%.2f",+d.getX(),d.getY(),d.getZ()));
 	}
-
 
 	public void renderCurve() {
 		cg.clearRect(0, 0, canvasCurve.getWidth(), canvasCurve.getHeight());
@@ -264,11 +351,11 @@ public class SampleController implements Initializable, Runnable{
 		ArrayList<Point2D> result = new ArrayList<Point2D>();
 
 		for(double delta = 0; delta <=1; delta+=this.deltaCurve) {
-			Map<Integer, ArrayList<Point2D>> layersMap = new HashMap<>();
+			Map<Integer, List<Point2D>> layersMap = new HashMap<>();
 			layersMap.put(0, dots);
 			for(int i = 0; i<layers;i++) {
-				ArrayList<Point2D> layer = layersMap.get(i);
-				ArrayList<Point2D> interpolated = new ArrayList<>();
+				List<Point2D> layer = layersMap.get(i);
+				List<Point2D> interpolated = new ArrayList<>();
 				for(int j = 0; j < layer.size()-1; j++) {
 					interpolated.add(Util.lerp(delta, layer.get(j), layer.get(j+1)));
 				}
@@ -303,7 +390,19 @@ public class SampleController implements Initializable, Runnable{
 			if(inBounds(event.getX(), event.getY())) {
 				dots.set(dragged, new Point2D(event.getX(), event.getY()));
 			}else {
-				dots.set(dragged, getBordered(event.getX(), event.getY()));
+				dots.set(dragged, getBordered(event.getX(), event.getY(),canvasCurve.getWidth(),canvasCurve.getHeight()));
+			}
+		}else {
+			if(!segmentsBox.getValue().equalsIgnoreCase("Move")) {
+				return;
+			}
+			if(fdragged<0) {
+				return;
+			}
+			if(inBounds(event.getX(), event.getY())) {
+				figure.set(fdragged, new Point2D(event.getX(), event.getY()));
+			}else {
+				figure.set(fdragged, getBordered(event.getX(), event.getY(),canvaslab4.getWidth(),canvaslab4.getHeight()));
 			}
 		}
 	}
@@ -316,11 +415,11 @@ public class SampleController implements Initializable, Runnable{
 		}
 		return true;
 	}
-	private Point2D getBordered(double x, double y) {
+	private Point2D getBordered(double x, double y, double width, double height) {
 		if(x<5) x = 6;
 		if(y<5) y = 6;
-		if(x+5>canvasCurve.getWidth()) x = canvasCurve.getWidth()-6;
-		if(y+5>canvasCurve.getHeight()) y = canvasCurve.getHeight()-6;
+		if(x+5>width) x = width-6;
+		if(y+5>height) y = height-6;
 		return new Point2D(x,y);
 	}
 	public void onMousePressed(MouseEvent event) {
@@ -328,7 +427,7 @@ public class SampleController implements Initializable, Runnable{
 			return;
 		}
 		if(dragged<0) {
-			int dot = findDot(event.getX(), event.getY());
+			int dot = findDot(dots, event.getX(), event.getY());
 			if(dot<0) {
 				return;
 			}
@@ -339,6 +438,7 @@ public class SampleController implements Initializable, Runnable{
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		System.out.println("init");
+		
 		cg = canvasCurve.getGraphicsContext2D();
 		deltaText.textProperty().addListener(new ChangeListener<String>() {
 
@@ -355,8 +455,6 @@ public class SampleController implements Initializable, Runnable{
 
 		});
 
-
-
 		sg = canvasSurface.getGraphicsContext2D();
 		Random r = new Random(System.currentTimeMillis());
 
@@ -370,11 +468,27 @@ public class SampleController implements Initializable, Runnable{
 		}
 		surface = new BezierSurface(t);
 		camera = new Camera(canvasSurface.getHeight()/canvasSurface.getWidth());
+		
+		l4g = canvaslab4.getGraphicsContext2D();
+		figure = new ArrayList<>();
+		figure.add(new Point2D(500,500));
+		figure.add(new Point2D(700,300));
+		figure.add(new Point2D(600,200));
+		figure.add(new Point2D(400,200));
+		figure.add(new Point2D(300,300));
 
+		double width = canvaslab4.getWidth(), height = canvaslab4.getHeight();
+		segments = new ArrayList<>();
+		for(int i = 0; i < 30; i++) {
+			segments.add(new Line2D(
+					new Point2D(r.nextDouble()*width, r.nextDouble()*height),
+					new Point2D(r.nextDouble()*width, r.nextDouble()*height)
+					));
+		}
 		new Thread(this).start();
 	}
 
-	private void removeDot(double x, double y) {
+	private List<Point2D> removeDot(List<Point2D>dots, double x, double y) {
 		for(int i = 0; i < dots.size(); i++) {
 			Point2D dot = dots.get(i);
 			if(Math.pow(x-dot.getX(),2)+Math.pow(y-dot.getY(), 2)<25) {
@@ -382,8 +496,9 @@ public class SampleController implements Initializable, Runnable{
 				i--;
 			}
 		}
+		return dots;
 	}
-	private int findDot(double x, double y) {
+	private int findDot(List<Point2D> dots, double x, double y) {
 		for(int i = 0; i < dots.size(); i++) {
 			Point2D dot = dots.get(i);
 			if(Math.pow(x-dot.getX(),2)+Math.pow(y-dot.getY(), 2)<25) {

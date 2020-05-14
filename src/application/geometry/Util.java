@@ -76,5 +76,20 @@ public class Util {
     	
     	return result;
     }
+    
+    public static boolean intersects(List<Point2D> figure, Line2D line) {
+    	Point2D[]polygon = new Point2D[figure.size()];
+    	polygon = figure.toArray(polygon);
+    	for(int i = 0; i<figure.size(); i++) {
+    		Line2D iline;
+    		if(i == 0) {
+    			iline = new Line2D(figure.get(figure.size()-1), figure.get(0));
+    		}else {
+    			iline = new Line2D(figure.get(i-1), figure.get(i));
+    		}
+    		if(iline.intersects(line)) return true;
+    	}
+    	return Line2D.isInside(polygon, line.a)||Line2D.isInside(polygon, line.b);
+    }
 
 }
