@@ -1,10 +1,5 @@
 package application;
 	
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-
-import application.geometry.BezierSurface;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
@@ -12,7 +7,6 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Point3D;
 
 
 public class Main extends Application {
@@ -39,17 +33,7 @@ public class Main extends Application {
 			box.getItems().addAll("Add", "Move", "Remove");
 			box.setValue("Add");
 			
-			Random r = new Random(System.currentTimeMillis());
-			
-			List<List<Point3D>> t = new ArrayList<>();
-			for(int i = 0; i < 5; i++) {
-				ArrayList<Point3D> l = new ArrayList<>();
-				for(int j = 0; j < 5; j++) {
-					l.add(new Point3D(i*10,j*10,r.nextDouble()%50));
-				}
-				t.add(l);
-			}
-			BezierSurface surface = new BezierSurface(t);
+
 			
 		} catch(Exception e) {
 			e.printStackTrace();

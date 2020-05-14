@@ -3,9 +3,15 @@ package application;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.ResourceBundle;
 
+import application.geometry.BezierSurface;
+import application.geometry.Camera;
+import application.geometry.Matrix;
+import application.geometry.Triangle;
 import application.geometry.Util;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -13,18 +19,22 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
+import javafx.geometry.Point3D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 
 public class SampleController implements Initializable, Runnable{
+	//curve
 	@FXML
-	private Canvas canvas;
+	private Canvas canvasCurve;
 	@FXML 
 	private ComboBox<String> modeBox;
 	@FXML
@@ -41,6 +51,22 @@ public class SampleController implements Initializable, Runnable{
 	private ArrayList<Point2D> dots = new ArrayList<>();
 	private int dragged = -1;
 	private double deltaCurve = 0.05;
+	
+	
+	//surface
+	@FXML
+	private Canvas canvasSurface;
+	@FXML
+	private ComboBox<String> modeBoxSurface;
+	@FXML
+	private TextField deltaTextSurface;
+	private GraphicsContext sg;
+	
+	private BezierSurface surface;
+	private Camera camera;
+	
+	
+
 	
 	public boolean running = true;
 	
@@ -63,6 +89,39 @@ public class SampleController implements Initializable, Runnable{
 		}
 	}
 	
+	public void onKeyPressed(KeyEvent event) {
+		int moveRight = 0;
+		int moveForward = 0;
+		int moveUp = 0;
+		switch(event.getCode()) {
+		case A:
+			moveRight-=1;
+			break;
+		case D:
+			moveRight+=1;
+			break;
+		case W:
+			moveForward+=1;
+			break;
+		case S:
+			moveForward-=1;
+			break;
+		case SPACE:
+			moveUp+=1;
+			break;
+		case SHIFT:
+			moveUp-=1;
+			break;
+		default:
+			break;
+		}
+		camera.move(moveForward, moveRight, moveUp, 0, 0);
+	}
+	
+	public void onKeyReleased(KeyEvent event) {
+		
+	}
+	
 	public void resetBtnPressed(ActionEvent event) {
 		dots.clear();
 		deltaCurve = 0.05;
@@ -80,11 +139,36 @@ public class SampleController implements Initializable, Runnable{
 	}
 	
 	private void renderSurface() {
+		sg.clearRect(0, 0, canvasSurface.getWidth(), canvasSurface.getHeight());
+		
+        Matrix cameraMatrix = Matrix.makeMatrixPointAt(camera.location,
+                camera.direction,
+                Camera.up);
+		
+		for(Triangle t : surface.translatePointsToTriangles()) {
+			Triangle translated = new Triangle(
+					Util.multiplyByMatrix(t.p1, cameraMatrix),
+					Util.multiplyByMatrix(t.p2, cameraMatrix),
+					Util.multiplyByMatrix(t.p3, cameraMatrix));
+			
+			if(translated.p1.getZ()<0||translated.p2.getZ()<0||translated.p3.getZ()<0) {
+				continue;
+			}
+			
+			Triangle projected = new Triangle(
+					Util.multiplyByMatrix(translated.p1, camera.projectionMatrix),
+					Util.multiplyByMatrix(translated.p2, camera.projectionMatrix),
+					Util.multiplyByMatrix(translated.p3, camera.projectionMatrix));
+			projected.shiftToView(canvasSurface.getWidth(), canvasSurface.getHeight());
+			
+			sg.fillPolygon(projected.getXPoints(), projected.getYPoints(), 3);
+		}
+		
 		
 	}
 
 	public void renderCurve() {
-		cg.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
+		cg.clearRect(0, 0, canvasCurve.getWidth(), canvasCurve.getHeight());
 		for (int i = 0; i <dots.size();i++) {
 			Point2D dot = dots.get(i);
 			if(i==dragged) {
@@ -148,7 +232,7 @@ public class SampleController implements Initializable, Runnable{
 		if(x<5||y<5) {
 			return false;
 		}
-		if(x+5>canvas.getWidth()||y+5>canvas.getHeight()) {
+		if(x+5>canvasCurve.getWidth()||y+5>canvasCurve.getHeight()) {
 			return false;
 		}
 		return true;
@@ -157,8 +241,8 @@ public class SampleController implements Initializable, Runnable{
 	private Point2D getBordered(double x, double y) {
 		if(x<5) x = 6;
 		if(y<5) y = 6;
-		if(x+5>canvas.getWidth()) x = canvas.getWidth()-6;
-		if(y+5>canvas.getHeight()) y = canvas.getHeight()-6;
+		if(x+5>canvasCurve.getWidth()) x = canvasCurve.getWidth()-6;
+		if(y+5>canvasCurve.getHeight()) y = canvasCurve.getHeight()-6;
 		return new Point2D(x,y);
 	}
 
@@ -179,7 +263,7 @@ public class SampleController implements Initializable, Runnable{
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		System.out.println("init");
-		cg = canvas.getGraphicsContext2D();
+		cg = canvasCurve.getGraphicsContext2D();
 		deltaText.textProperty().addListener(new ChangeListener<String>() {
 
 			@Override
@@ -194,6 +278,22 @@ public class SampleController implements Initializable, Runnable{
 			}
 			
 		});
+		
+		
+		
+		sg = canvasSurface.getGraphicsContext2D();
+		Random r = new Random(System.currentTimeMillis());
+		
+		List<List<Point3D>> t = new ArrayList<>();
+		for(int i = 0; i < 5; i++) {
+			ArrayList<Point3D> l = new ArrayList<>();
+			for(int j = 0; j < 5; j++) {
+				l.add(new Point3D(i*10,j*10,r.nextDouble()%50));
+			}
+			t.add(l);
+		}
+		surface = new BezierSurface(t);
+		camera = new Camera(canvasSurface.getWidth()/canvasSurface.getHeight());
 		
 		new Thread(this).start();
 	}

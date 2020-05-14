@@ -26,8 +26,9 @@ public class BezierSurface {
 	}
 	
 	private void calculatePoint(double u, double v) {
-		int uindex = (int) (u/precision);
-		int vindex = (int) (v/precision);
+		
+		int uindex = (int) Math.round(u * points.length);//(int) (u/precision);
+		int vindex = (int) Math.round(v * points[0].length);//(int) (v/precision);
 		
 		double bPoly, sumX = 0, sumY = 0, sumZ = 0;
 
@@ -47,8 +48,22 @@ public class BezierSurface {
         List<Triangle> tris = new ArrayList<>();
         for (int i = 1; i < points.length; i++) {
             for (int j = 1; j < points[0].length; j++) {
-                tris.add(new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1]));
-                tris.add(new Triangle(points[i][j - 1], points[i - 1][j], points[i][j]));
+            	Triangle t = new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1]);
+                tris.add(t);
+                t = new Triangle(points[i][j - 1], points[i - 1][j], points[i][j]);
+                tris.add(t);
+                if(points[i][j]==null) {
+                	System.out.println("null at "+i+" "+j);
+                }
+                if(points[i][j-1]==null) {
+                	System.out.println("null at "+i+" "+(j-1));
+                }
+                if(points[i-1][j]==null) {
+                	System.out.println("null at "+(i-1)+" "+j);
+                }
+                if(points[i-1][j-1]==null) {
+                	System.out.println("null at "+(i-1)+" "+(j-1));
+                }
             }
         }
         return tris;
