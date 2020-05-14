@@ -35,6 +35,10 @@ public class Triangle {
     	p1 = new Point3D((p1.getX()+1)*0.5*width, (p1.getY()+1)*0.5*height, p1.getZ());
     	p1 = new Point3D((p2.getX()+1)*0.5*width, (p2.getY()+1)*0.5*height, p2.getZ());
     	p1 = new Point3D((p3.getX()+1)*0.5*width, (p3.getY()+1)*0.5*height, p3.getZ());
-    	
+	}
+	
+	@Override
+	public String toString() {
+		return "{"+p1+", "+p2+", "+p3+"}";
 	}
 }

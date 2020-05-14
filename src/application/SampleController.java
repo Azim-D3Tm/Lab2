@@ -145,21 +145,25 @@ public class SampleController implements Initializable, Runnable{
                 camera.direction,
                 Camera.up);
 		
-		for(Triangle t : surface.translatePointsToTriangles()) {
+		//for(Triangle t : surface.translatePointsToTriangles()) {
+		for(Triangle t: Util.generateCube()) {
 			Triangle translated = new Triangle(
 					Util.multiplyByMatrix(t.p1, cameraMatrix),
 					Util.multiplyByMatrix(t.p2, cameraMatrix),
 					Util.multiplyByMatrix(t.p3, cameraMatrix));
 			
+			
+			/*
 			if(translated.p1.getZ()<0||translated.p2.getZ()<0||translated.p3.getZ()<0) {
 				continue;
-			}
+			}*/
 			
 			Triangle projected = new Triangle(
 					Util.multiplyByMatrix(translated.p1, camera.projectionMatrix),
 					Util.multiplyByMatrix(translated.p2, camera.projectionMatrix),
 					Util.multiplyByMatrix(translated.p3, camera.projectionMatrix));
-			projected.shiftToView(canvasSurface.getWidth(), canvasSurface.getHeight());
+			//projected.shiftToView(canvasSurface.getWidth(), canvasSurface.getHeight());
+			System.out.println(projected);
 			
 			sg.fillPolygon(projected.getXPoints(), projected.getYPoints(), 3);
 		}
@@ -326,9 +330,10 @@ public class SampleController implements Initializable, Runnable{
         while(running) {
         	
         	delta = System.currentTimeMillis() - lastTime;
-        	if(delta<30) {
+        	if(delta<1000) {
         		continue;
         	}
+        	System.out.println("drawing");
         	lastTime = System.currentTimeMillis();
         	render();
         }
