@@ -5,18 +5,19 @@ import javafx.scene.paint.Color;
 
 public class Triangle {
 	public Point3D p1, p2, p3;
-	public Color lineColor, fillColor;
+	public Color lineColor, frontColor, backColor;
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3) {
-		this(p1,p2,p3, Color.BLACK, Color.color(0,1,1, 0.3));
+		this(p1,p2,p3, Color.BLACK, Color.color(0,1,1, 0.3), Color.color(1, 1, 0, 0.3));
 	}
 	
-	public Triangle(Point3D p1, Point3D p2, Point3D p3, Color lineColor, Color fillColor) {
+	public Triangle(Point3D p1, Point3D p2, Point3D p3, Color lineColor, Color frontColor, Color backColor) {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
 		this.lineColor = lineColor;
-		this.fillColor = fillColor;
+		this.frontColor = frontColor;
+		this.backColor = backColor;
 	}
 	
 	public Point3D[] getPoints() {
@@ -29,6 +30,12 @@ public class Triangle {
 	
 	public double[] getYPoints() {
 		return new double[] {p1.getY(), p2.getY(), p3.getY()};
+	}
+	
+	public Point3D getNormal() {
+		Point3D line = p2.subtract(p1);
+		Point3D line2 = p3.subtract(p2);
+		return line.crossProduct(line2).normalize();
 	}
 	
 	public void shiftToView(double width, double height) {

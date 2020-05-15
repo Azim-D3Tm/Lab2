@@ -24,6 +24,7 @@ import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.Tab;
@@ -67,6 +68,8 @@ public class SampleController implements Initializable, Runnable{
 	private Label camLocation;
 	@FXML
 	private Label camDirection;
+	@FXML
+	private CheckBox paintFaces;
 
 
 	private GraphicsContext sg;
@@ -269,7 +272,8 @@ public class SampleController implements Initializable, Runnable{
 						Util.multiplyByMatrix(t.p2, rx),
 						Util.multiplyByMatrix(t.p3, rx),
 						t.lineColor,
-						t.fillColor);
+						t.frontColor,
+						t.backColor);
 			}
 			double roty = getRotationAngleY();
 			if(roty!=0) {
@@ -279,12 +283,16 @@ public class SampleController implements Initializable, Runnable{
 						Util.multiplyByMatrix(t.p2, ry),
 						Util.multiplyByMatrix(t.p3, ry),
 						t.lineColor,
-						t.fillColor);
+						t.frontColor,
+						t.backColor);
 			}
 			Triangle translated = new Triangle(
 					Util.multiplyByMatrix(t.p1, cameraMatrix),
 					Util.multiplyByMatrix(t.p2, cameraMatrix),
-					Util.multiplyByMatrix(t.p3, cameraMatrix));
+					Util.multiplyByMatrix(t.p3, cameraMatrix),
+					t.lineColor,
+					t.frontColor,
+					t.backColor);
 
 			if(translated.p1.getZ()<0||translated.p2.getZ()<0||translated.p3.getZ()<0) {
 				continue;
@@ -293,12 +301,26 @@ public class SampleController implements Initializable, Runnable{
 			Triangle projected = new Triangle(
 					Util.multiplyByMatrix(translated.p1, camera.projectionMatrix),
 					Util.multiplyByMatrix(translated.p2, camera.projectionMatrix),
-					Util.multiplyByMatrix(translated.p3, camera.projectionMatrix));
+					Util.multiplyByMatrix(translated.p3, camera.projectionMatrix),
+					translated.lineColor,
+					translated.frontColor,
+					translated.backColor);
 
 			projected.shiftToView(canvasSurface.getWidth(), canvasSurface.getHeight());
-			sg.setFill(t.fillColor);
-			sg.fillPolygon(projected.getXPoints(), projected.getYPoints(), 3);
-			sg.setFill(t.lineColor);
+			
+			if(paintFaces.isSelected()) {
+				double dot = t.getNormal().dotProduct(t.p1.subtract(camera.location));
+				if(dot<0) {
+					sg.setFill(t.frontColor);
+				}else {
+					sg.setFill(t.backColor);
+				}
+				//System.out.println(dot);
+				
+				sg.fillPolygon(projected.getXPoints(), projected.getYPoints(), 3);
+			}
+			
+			sg.setStroke(t.lineColor);
 			sg.strokePolygon(projected.getXPoints(), projected.getYPoints(), 3);
 		}
 		drawCamInfo();
