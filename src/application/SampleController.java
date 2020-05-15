@@ -11,6 +11,7 @@ import java.util.ResourceBundle;
 
 import application.geometry.BezierSurface;
 import application.geometry.Camera;
+import application.geometry.LightSource;
 import application.geometry.Line2D;
 import application.geometry.Matrix;
 import application.geometry.Triangle;
@@ -28,6 +29,7 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.Slider;
 import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TextField;
@@ -53,8 +55,6 @@ public class SampleController implements Initializable, Runnable{
 	private List<Point2D> dots = new ArrayList<>();
 	private int dragged = -1;
 	private double deltaCurve = 0.05;
-	
-
 
 	//surface
 	@FXML
@@ -70,14 +70,29 @@ public class SampleController implements Initializable, Runnable{
 	@FXML
 	private Label camDirection;
 	@FXML
+	private Label lightPos;
+	@FXML
 	private CheckBox paintFaces;
-
+	@FXML
+	private CheckBox doLighting;
+	@FXML
+	private CheckBox drawLines;
+	@FXML
+	private Slider xSlider;
+	@FXML
+	private Slider ySlider;
+	@FXML
+	private Slider zSlider;
+	
 
 	private GraphicsContext sg;
 
 	private BezierSurface surface;
 	private Camera camera;
-
+	private LightSource light;
+	//private Point2D offset = new Point2D(0,0);
+	
+	
 	
 	//lab 4, segments
 	@FXML
@@ -188,6 +203,7 @@ public class SampleController implements Initializable, Runnable{
 		if(tabPane.getSelectionModel().getSelectedItem()==curveTab) {
 			renderCurve();
 		}else if(tabPane.getSelectionModel().getSelectedItem()==surfaceTab){
+			light.location = new Point3D(xSlider.getValue(), ySlider.getValue(), zSlider.getValue());
 			renderSurface();
 		}else {
 			renderLab4();
@@ -288,6 +304,9 @@ public class SampleController implements Initializable, Runnable{
 						t.frontColor,
 						t.backColor);
 			}
+			if(doLighting.isSelected()) {
+				t.calculateLuminance(light);
+			}
 			Triangle translated = new Triangle(
 					Util.multiplyByMatrix(t.p1, cameraMatrix),
 					Util.multiplyByMatrix(t.p2, cameraMatrix),
@@ -311,10 +330,13 @@ public class SampleController implements Initializable, Runnable{
 			projected.shiftToView(canvasSurface.getWidth(), canvasSurface.getHeight());
 			
 			double dot = t.getNormal().dotProduct(t.p1.subtract(camera.location));
+			
 			if(dot>0) {
 				projected.frontColor = t.backColor;
 				projected.backColor = t.frontColor;
 			}
+
+			
 			renderQueue.add(projected);
 		}
 		
@@ -336,12 +358,27 @@ public class SampleController implements Initializable, Runnable{
 			if(paintFaces.isSelected()) {
 				sg.setFill(t.frontColor);
 				sg.fillPolygon(t.getXPoints(), t.getYPoints(), 3);
+				sg.setStroke(t.frontColor);
+				sg.strokePolygon(t.getXPoints(), t.getYPoints(), 3);
 			}
-			sg.setStroke(t.lineColor);
-			sg.strokePolygon(t.getXPoints(), t.getYPoints(), 3);
+			if(drawLines.isSelected()) {
+				sg.setStroke(t.lineColor);
+				sg.strokePolygon(t.getXPoints(), t.getYPoints(), 3);
+			}
 		}
+		sg.setFill(Color.BLACK);
+		Point3D light = Util.multiplyByMatrix(this.light.location, cameraMatrix);
+		if(light.getZ()>0) {
+			light = Util.multiplyByMatrix(light, camera.projectionMatrix);
+			light = Util.shiftPointToView(light, canvasSurface.getWidth(), canvasSurface.getHeight());
+			sg.fillOval(light.getX()-5, light.getY()-5, 10, 10);
+		}
+		
 		drawCamInfo();
 	}
+	
+
+	
 	private double getRotationAngleY() {
 		String text = rotY.getText();
 		try {
@@ -368,6 +405,9 @@ public class SampleController implements Initializable, Runnable{
 
 		Point3D d = camera.direction;
 		camDirection.setText(String.format("Camera direction: %.2f:%.2f:%.2f",+d.getX(),d.getY(),d.getZ()));
+		
+		l = light.location;
+		lightPos.setText(String.format("Light location: %.2f:%.2f:%.2f",+l.getX(),l.getY(),l.getZ()));
 	}
 
 	public void renderCurve() {
@@ -498,15 +538,16 @@ public class SampleController implements Initializable, Runnable{
 		Random r = new Random(System.currentTimeMillis());
 
 		List<List<Point3D>> t = new ArrayList<>();
-		for(int i = 0; i < 5; i++) {
+		for(int i = -2; i < 3; i++) {
 			ArrayList<Point3D> l = new ArrayList<>();
-			for(int j = 0; j < 5; j++) {
-				l.add(new Point3D(i*10,j*10,r.nextDouble()*50));
+			for(int j = -2; j < 3; j++) {
+				l.add(new Point3D(i*10,j*10, r.nextDouble()*25));
 			}
 			t.add(l);
 		}
 		surface = new BezierSurface(t);
 		camera = new Camera(canvasSurface.getHeight()/canvasSurface.getWidth());
+		light = new LightSource(new Point3D(26,20,29), 1);
 		
 		l4g = canvaslab4.getGraphicsContext2D();
 		figure = new ArrayList<>();

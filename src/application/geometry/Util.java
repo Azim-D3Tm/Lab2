@@ -5,6 +5,7 @@ import java.util.List;
 
 import javafx.geometry.Point2D;
 import javafx.geometry.Point3D;
+import javafx.scene.paint.Color;
 
 public class Util {
 	
@@ -91,5 +92,16 @@ public class Util {
     	}
     	return Line2D.isInside(polygon, line.a)||Line2D.isInside(polygon, line.b);
     }
-
+    
+    public static Color combineColors(Color a, Color b, double factor) {
+    	double red = a.getRed() + (b.getRed()-a.getRed())*factor;
+    	double green = a.getGreen() + (b.getGreen()-a.getGreen())*factor;
+    	double blue = a.getBlue() + (b.getBlue()-a.getBlue())*factor;
+    	double opacity = a.getOpacity() + (b.getOpacity()-a.getOpacity())*factor;
+    	return Color.color(red, green, blue, opacity);
+    }
+    
+    public static Point3D shiftPointToView(Point3D point, double width, double height) {
+    	return new Point3D((point.getX()+1)*0.5*width, (point.getY()*-1+1)*0.5*height, point.getZ());
+    }
 }
