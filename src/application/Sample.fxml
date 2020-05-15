@@ -72,6 +72,7 @@
                                  <font>
                                     <Font name="Consolas" size="12.0" />
                                  </font></Label>
+                              <CheckBox fx:id="drawControlPoints" layoutX="115.0" layoutY="137.0" mnemonicParsing="false" text="Draw control points" />
                            </children>
                         </AnchorPane>
                         <AnchorPane minHeight="0.0" minWidth="0.0" SplitPane.resizableWithParent="false">

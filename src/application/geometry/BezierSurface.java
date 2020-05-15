@@ -7,7 +7,7 @@ import javafx.geometry.Point3D;
 
 public class BezierSurface {
 	
-	private List<List<Point3D>> criticalPoints;
+	public List<List<Point3D>> criticalPoints;
 	private static double precision = 0.02;
 	private Point3D[][]points;
 	

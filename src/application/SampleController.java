@@ -78,6 +78,8 @@ public class SampleController implements Initializable, Runnable{
 	@FXML
 	private CheckBox drawLines;
 	@FXML
+	private CheckBox drawControlPoints;
+	@FXML
 	private Slider xSlider;
 	@FXML
 	private Slider ySlider;
@@ -295,7 +297,7 @@ public class SampleController implements Initializable, Runnable{
 			}
 			double roty = getRotationAngleY();
 			if(roty!=0) {
-				Matrix ry = Matrix.rotationMatrix(0, roty, 4);
+				Matrix ry = Matrix.rotationMatrix(1, roty, 4);
 				t = new Triangle(
 						Util.multiplyByMatrix(t.p1, ry),
 						Util.multiplyByMatrix(t.p2, ry),
@@ -372,6 +374,17 @@ public class SampleController implements Initializable, Runnable{
 			light = Util.multiplyByMatrix(light, camera.projectionMatrix);
 			light = Util.shiftPointToView(light, canvasSurface.getWidth(), canvasSurface.getHeight());
 			sg.fillOval(light.getX()-5, light.getY()-5, 10, 10);
+		}
+		if(drawControlPoints.isSelected()) {
+			sg.setFill(Color.RED);
+			for(List<Point3D> part:surface.criticalPoints) {
+				for(Point3D point:part) {
+					Point3D p = Util.multiplyByMatrix(point, cameraMatrix);
+					p = Util.multiplyByMatrix(p, camera.projectionMatrix);
+					p = Util.shiftPointToView(p, canvasSurface.getWidth(), canvasSurface.getHeight());
+					sg.fillOval(p.getX()-3, p.getY()-3, 6, 6);
+				}
+			}
 		}
 		
 		drawCamInfo();
