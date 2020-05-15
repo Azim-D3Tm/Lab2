@@ -547,7 +547,7 @@ public class SampleController implements Initializable, Runnable{
 		}
 		surface = new BezierSurface(t);
 		camera = new Camera(canvasSurface.getHeight()/canvasSurface.getWidth());
-		light = new LightSource(new Point3D(26,20,29), 1);
+		light = new LightSource(new Point3D(26,20,29), 30);
 		
 		l4g = canvaslab4.getGraphicsContext2D();
 		figure = new ArrayList<>();

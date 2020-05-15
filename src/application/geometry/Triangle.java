@@ -57,11 +57,18 @@ public class Triangle {
 	}
 	
 	public void calculateLuminance(LightSource light) {
-		Point3D direction = this.getCentrePoint().subtract(light.location).normalize();
+		Point3D offset = this.getCentrePoint().subtract(light.location);
+		Point3D direction = offset.normalize();
 		double luminance = this.getNormal().dotProduct(direction);
+		double distance = new Point3D(0,0,0).distance(offset);
+		if(distance>=light.intensity) {
+			luminance = 1;
+		}else {
+			luminance = (distance/light.intensity);
+		}
+		
 		boolean l = luminance<0;
 		this.frontColor = Util.combineColors(this.frontColor, l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
-		this.backColor = Util.combineColors(this.backColor, !l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
-		
+		this.backColor = Util.combineColors(this.backColor, l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
 	}
 }
