@@ -2,6 +2,7 @@ package application;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -261,7 +262,8 @@ public class SampleController implements Initializable, Runnable{
 		Matrix cameraMatrix = Matrix.makeMatrixPointAt(camera.location,
 				camera.direction,
 				Camera.up);
-
+		List<Triangle> renderQueue = new ArrayList<Triangle>();
+		
 		for(Triangle t : surface.translatePointsToTriangles()) {
 			//for(Triangle t: Util.generateCube()) {
 			double rotx = getRotationAngleX();
@@ -308,20 +310,35 @@ public class SampleController implements Initializable, Runnable{
 
 			projected.shiftToView(canvasSurface.getWidth(), canvasSurface.getHeight());
 			
-			if(paintFaces.isSelected()) {
-				double dot = t.getNormal().dotProduct(t.p1.subtract(camera.location));
-				if(dot<0) {
-					sg.setFill(t.frontColor);
-				}else {
-					sg.setFill(t.backColor);
-				}
-				//System.out.println(dot);
-				
-				sg.fillPolygon(projected.getXPoints(), projected.getYPoints(), 3);
+			double dot = t.getNormal().dotProduct(t.p1.subtract(camera.location));
+			if(dot>0) {
+				projected.frontColor = t.backColor;
+				projected.backColor = t.frontColor;
 			}
-			
+			renderQueue.add(projected);
+		}
+		
+		renderQueue.sort(new Comparator<Triangle>() {
+			@Override
+			public int compare(Triangle o1, Triangle o2) {
+				double z1 = (o1.p1.getZ()+o1.p2.getZ()+o1.p3.getZ())/3;
+				double z2 = (o2.p1.getZ()+o2.p2.getZ()+o2.p3.getZ())/3;
+				if(z1>z2) {
+					return -1;
+				}else if (z1<z2) {
+					return 1;
+				}
+				return 0;
+			}
+		});
+		
+		for(Triangle t:renderQueue) {
+			if(paintFaces.isSelected()) {
+				sg.setFill(t.frontColor);
+				sg.fillPolygon(t.getXPoints(), t.getYPoints(), 3);
+			}
 			sg.setStroke(t.lineColor);
-			sg.strokePolygon(projected.getXPoints(), projected.getYPoints(), 3);
+			sg.strokePolygon(t.getXPoints(), t.getYPoints(), 3);
 		}
 		drawCamInfo();
 	}

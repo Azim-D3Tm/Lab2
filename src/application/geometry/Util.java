@@ -56,23 +56,23 @@ public class Util {
     	Point3D b4 = new Point3D(0,1,1);
     	
     	//up
-    	result.add(new Triangle(a1,a2,a3));
-    	result.add(new Triangle(a2,a3,a4));
+    	result.add(new Triangle(a1,a2,a3,1));
+    	result.add(new Triangle(a2,a3,a4,1));
     	//down
-    	result.add(new Triangle(b1,b2,b3));
-    	result.add(new Triangle(b2,b3,b4));
+    	result.add(new Triangle(b1,b2,b3,1));
+    	result.add(new Triangle(b2,b3,b4,1));
     	//front
-    	result.add(new Triangle(a1,a2,b1));
-    	result.add(new Triangle(b1,b2,a2));
+    	result.add(new Triangle(a1,a2,b1,1));
+    	result.add(new Triangle(b1,b2,a2,1));
     	//back
-    	result.add(new Triangle(a3,a4,b3));
-    	result.add(new Triangle(b3,b4,a4));
+    	result.add(new Triangle(a3,a4,b3,1));
+    	result.add(new Triangle(b3,b4,a4,1));
     	//left
-    	result.add(new Triangle(a1,a3,b1));
-    	result.add(new Triangle(b1,b3,a3));
+    	result.add(new Triangle(a1,a3,b1,1));
+    	result.add(new Triangle(b1,b3,a3,1));
     	//right
-    	result.add(new Triangle(a2,a4,b2));
-    	result.add(new Triangle(b2,b4,a4));
+    	result.add(new Triangle(a2,a4,b2,1));
+    	result.add(new Triangle(b2,b4,a4,1));
     	
     	return result;
     }

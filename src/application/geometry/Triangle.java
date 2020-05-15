@@ -7,8 +7,8 @@ public class Triangle {
 	public Point3D p1, p2, p3;
 	public Color lineColor, frontColor, backColor;
 	
-	public Triangle(Point3D p1, Point3D p2, Point3D p3) {
-		this(p1,p2,p3, Color.BLACK, Color.color(0,1,1, 0.3), Color.color(1, 1, 0, 0.3));
+	public Triangle(Point3D p1, Point3D p2, Point3D p3, double transparency) {
+		this(p1,p2,p3, Color.BLACK, Color.color(0,1,1, transparency), Color.color(1, 1, 0, transparency));
 	}
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3, Color lineColor, Color frontColor, Color backColor) {

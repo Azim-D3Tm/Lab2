@@ -47,9 +47,9 @@ public class BezierSurface {
         List<Triangle> tris = new ArrayList<>();
         for (int i = 1; i < points.length; i++) {
             for (int j = 1; j < points[0].length; j++) {
-            	Triangle t = new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1]);
+            	Triangle t = new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1], 1);
                 tris.add(t);
-                t = new Triangle(points[i][j - 1], points[i - 1][j], points[i][j]);
+                t = new Triangle(points[i][j - 1], points[i - 1][j], points[i][j], 1);
                 tris.add(t);
                 if(points[i][j]==null) {
                 	System.out.println("null at "+i+" "+j);
