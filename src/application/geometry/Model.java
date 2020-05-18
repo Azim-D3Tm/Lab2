@@ -5,19 +5,28 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 
 public class Model {
-	private List<Triangle> faces;
+	protected List<Triangle> faces;
+	public Point3D origin;
 
-	public Model() {
+	public Model(Point3D origin) {
 		faces = new ArrayList<Triangle>();
+		this.origin = origin;
 	}
 
 	public List<Triangle> getFaces() {
 		return faces;
+	}
+	
+	public List<Triangle> getGlobalFaces(){
+		return faces.stream().map(triangle ->{
+			return new Triangle(triangle, origin);
+		}).collect(Collectors.toList());
 	}
 
 	public Model load(String path) throws IOException {
@@ -44,7 +53,6 @@ public class Model {
 					int v1 = Integer.parseInt(vs1[0]);
 					int v2 = Integer.parseInt(vs2[0]);
 					int v3 = Integer.parseInt(vs3[0]);
-
 					int n1 = Integer.parseInt(vs1[1]);
 					int n2 = Integer.parseInt(vs2[1]);
 					int n3 = Integer.parseInt(vs3[1]);
@@ -114,16 +122,8 @@ public class Model {
 					faces.add(t);
 				}
 			}
-
-
-
 		}
 		model.close();
-
-
-
 		return this;
 	}
-
-
 }

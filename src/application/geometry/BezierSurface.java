@@ -5,13 +5,15 @@ import java.util.List;
 
 import javafx.geometry.Point3D;
 
-public class BezierSurface {
+public class BezierSurface extends Model{
 	
 	public List<List<Point3D>> criticalPoints;
 	private static double precision = 0.02;
 	private Point3D[][]points;
 	
-	public BezierSurface(List<List<Point3D>> ctrlPoints) {
+	
+	public BezierSurface(Point3D origin, List<List<Point3D>> ctrlPoints) {
+		super(origin);
 		criticalPoints = new ArrayList<>(ctrlPoints);
 		points = new Point3D[(int) (1.0 / precision)][(int) (1.0 / precision)];
 		calculatePoints();
@@ -22,6 +24,14 @@ public class BezierSurface {
 				calculatePoint(u,v);
 			}
 		}
+        for (int i = 1; i < points.length; i++) {
+            for (int j = 1; j < points[0].length; j++) {
+            	Triangle t = new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1], 1);
+            	faces.add(t);
+                t = new Triangle(points[i][j - 1], points[i - 1][j], points[i][j], 1);
+                faces.add(t);
+            }
+        }
 	}
 	
 	private void calculatePoint(double u, double v) {
@@ -42,30 +52,5 @@ public class BezierSurface {
         }
 		points[uindex][vindex] = new Point3D(sumX, sumY, sumZ);
 	}
-	
-	public List<Triangle> translatePointsToTriangles() {
-        List<Triangle> tris = new ArrayList<>();
-        for (int i = 1; i < points.length; i++) {
-            for (int j = 1; j < points[0].length; j++) {
-            	Triangle t = new Triangle(points[i - 1][j - 1], points[i - 1][j], points[i][j - 1], 1);
-                tris.add(t);
-                t = new Triangle(points[i][j - 1], points[i - 1][j], points[i][j], 1);
-                tris.add(t);
-                if(points[i][j]==null) {
-                	System.out.println("null at "+i+" "+j);
-                }
-                if(points[i][j-1]==null) {
-                	System.out.println("null at "+i+" "+(j-1));
-                }
-                if(points[i-1][j]==null) {
-                	System.out.println("null at "+(i-1)+" "+j);
-                }
-                if(points[i-1][j-1]==null) {
-                	System.out.println("null at "+(i-1)+" "+(j-1));
-                }
-            }
-        }
-        return tris;
-    }
 	
 }

@@ -32,6 +32,10 @@ public class Triangle {
 		this.backColor = backColor;
 	}
 	
+	public Triangle(Triangle t, Point3D offset) {
+		this(t.p1.add(offset), t.p2.add(offset), t.p3.add(offset), t.n1, t.n2, t.n3, t.lineColor, t.frontColor, t.backColor);
+	}
+	
 	public Point3D[] getPoints() {
 		return new Point3D[] {p1, p2, p3};
 	}

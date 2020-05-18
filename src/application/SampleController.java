@@ -282,7 +282,7 @@ public class SampleController implements Initializable, Runnable{
 				Camera.up);
 		List<Triangle> renderQueue = new ArrayList<Triangle>();
 		
-		for(Triangle t : surface.translatePointsToTriangles()) {
+		for(Triangle t : surface.getFaces()) {
 			//for(Triangle t: Util.generateCube()) {
 			double rotx = getRotationAngleX();
 			if(rotx!=0) {
@@ -558,7 +558,7 @@ public class SampleController implements Initializable, Runnable{
 			}
 			t.add(l);
 		}
-		surface = new BezierSurface(t);
+		surface = new BezierSurface(new Point3D(0,0,0),t);
 		camera = new Camera(canvasSurface.getHeight()/canvasSurface.getWidth());
 		light = new LightSource(new Point3D(26,20,29), 30);
 		
