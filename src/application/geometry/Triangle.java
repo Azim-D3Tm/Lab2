@@ -4,7 +4,7 @@ import javafx.geometry.Point3D;
 import javafx.scene.paint.Color;
 
 public class Triangle {
-	public Point3D p1, p2, p3;
+	public Point3D p1, p2, p3, n1, n2, n3;
 	public Color lineColor, frontColor, backColor;
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3, double opacity) {
@@ -15,6 +15,18 @@ public class Triangle {
 		this.p1 = p1;
 		this.p2 = p2;
 		this.p3 = p3;
+		this.lineColor = lineColor;
+		this.frontColor = frontColor;
+		this.backColor = backColor;
+		this.n1 = this.n2 = this.n3 = getNormal();
+	}
+	public Triangle(Point3D p1, Point3D p2, Point3D p3, Point3D n1, Point3D n2, Point3D n3, Color lineColor, Color frontColor, Color backColor) {
+		this.p1 = p1;
+		this.p2 = p2;
+		this.p3 = p3;
+		this.n1 = n1;
+		this.n2 = n2;
+		this.n3 = n3;
 		this.lineColor = lineColor;
 		this.frontColor = frontColor;
 		this.backColor = backColor;
@@ -37,6 +49,20 @@ public class Triangle {
 		Point3D line2 = p3.subtract(p2);
 		return line.crossProduct(line2).normalize();
 	}
+	
+	public Point3D getNormal(int i) {
+		switch(i) {
+		case 0:
+			return n1;
+		case 1:
+			return n2;
+		case 2:
+			return n3;
+		default:
+			return n1;
+		}
+	}
+	
 	
 	public Point3D getCentrePoint() {
 		return new Point3D(
