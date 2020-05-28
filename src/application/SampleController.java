@@ -283,7 +283,6 @@ public class SampleController implements Initializable, Runnable{
 		List<Triangle> renderQueue = new ArrayList<Triangle>();
 		
 		for(Triangle t : surface.getFaces()) {
-			//for(Triangle t: Util.generateCube()) {
 			double rotx = getRotationAngleX();
 			if(rotx!=0) {
 				Matrix rx = Matrix.rotationMatrix(0, rotx, 4);
@@ -307,7 +306,7 @@ public class SampleController implements Initializable, Runnable{
 						t.backColor);
 			}
 			if(doLighting.isSelected()) {
-				t.calculateLuminance(light);
+				t = t.calculateLuminance(light);
 			}
 			Triangle translated = new Triangle(
 					Util.multiplyByMatrix(t.p1, cameraMatrix),
@@ -368,7 +367,7 @@ public class SampleController implements Initializable, Runnable{
 				sg.strokePolygon(t.getXPoints(), t.getYPoints(), 3);
 			}
 		}
-		sg.setFill(Color.BLACK);
+		sg.setFill(Color.RED);
 		Point3D light = Util.multiplyByMatrix(this.light.location, cameraMatrix);
 		if(light.getZ()>0) {
 			light = Util.multiplyByMatrix(light, camera.projectionMatrix);
@@ -560,7 +559,7 @@ public class SampleController implements Initializable, Runnable{
 		}
 		surface = new BezierSurface(new Point3D(0,0,0),t);
 		camera = new Camera(canvasSurface.getHeight()/canvasSurface.getWidth());
-		light = new LightSource(new Point3D(26,20,29), 30);
+		light = new LightSource(new Point3D(26,20,29), 50);
 		
 		l4g = canvaslab4.getGraphicsContext2D();
 		figure = new ArrayList<>();

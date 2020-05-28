@@ -10,6 +10,9 @@ public class Triangle {
 	public Triangle(Point3D p1, Point3D p2, Point3D p3, double opacity) {
 		this(p1,p2,p3, Color.BLACK, Color.color(0,1,1, opacity), Color.color(1, 1, 0, opacity));
 	}
+	public Triangle(Triangle t, Color frontColor, Color backColor) {
+		this(t.p1,t.p2,t.p3,t.n1,t.n2,t.n3,t.lineColor,frontColor,backColor);
+	}
 	
 	public Triangle(Point3D p1, Point3D p2, Point3D p3, Color lineColor, Color frontColor, Color backColor) {
 		this.p1 = p1;
@@ -83,22 +86,23 @@ public class Triangle {
 	
 	@Override
 	public String toString() {
-		return "{"+p1+", "+p2+", "+p3+"}";
+		return "pos:{"+p1+", "+p2+", "+p3+"}, norm:{"+p1+", "+p2+", "+p3+"}";
 	}
 	
-	public void calculateLuminance(LightSource light) {
+	public Triangle calculateLuminance(LightSource light) {
 		Point3D offset = this.getCentrePoint().subtract(light.location);
 		Point3D direction = offset.normalize();
 		double luminance = this.getNormal().dotProduct(direction);
 		double distance = new Point3D(0,0,0).distance(offset);
 		if(distance>=light.intensity) {
 			luminance = 1;
-		}else {
+		}else{
 			luminance = (distance/light.intensity);
 		}
 		
 		boolean l = luminance<0;
-		this.frontColor = Util.combineColors(this.frontColor, l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
-		this.backColor = Util.combineColors(this.backColor, l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
+		Color frontColor = Util.combineColors(this.frontColor, l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
+		Color backColor = Util.combineColors(this.backColor, l?light.color:light.color.invert(), luminance>0?luminance:-luminance);
+		return new Triangle(this, frontColor, backColor);
 	}
 }
